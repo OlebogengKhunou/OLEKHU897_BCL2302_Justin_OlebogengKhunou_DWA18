@@ -28,18 +28,18 @@ body {
   margin: 0%;
 }
 
-.king{
-  display: flex;
-  justify-content: center;
-  align-self: center;
-}
-
 .signUp{
  width: 300px;
  border: 1px solid rgb(86, 84, 84);
  border-radius: 10px;
-padding: 15px;
+ padding: 15px;
+}
 
+.signUpdiv{
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 img{
@@ -49,7 +49,7 @@ img{
 }
 
 .showItem{
-  width: 180px;
+  width: 174.8px;
   height: 280px;
   border: 1px solid black;
   border-radius: 5px;
@@ -60,11 +60,12 @@ img{
   text-align: left;
 }
 
-
-/* .showList{
+.previewDiv{
+  padding: 0px 10px;
   display: grid;
-  grid: repeat(9, 300px) / auto-flow 150px;
-} */
+  grid-template-columns: repeat(auto-fit, minmax(176px, 1fr));
+  grid-gap: 2px;
+}
 
 nav{
   background-color: rgb(21, 22, 53);
@@ -102,18 +103,17 @@ flex-direction: column;
   top:6px;
 }
 
-
-
 .episodes{
   width: 300px;
-  height: 100px;
+  height: 110px;
   border: 1px solid black;
   border-radius: 7px;
   background-color: grey;
   color:white;
   padding: 20px;
   font-size: 10px;
-  text-align: center;
+  text-align: left;
+  
 }
 
 #miniplayer{
@@ -133,7 +133,6 @@ flex-direction: column;
 }
 
 .Causarol{
-  height: fit-content;
   padding-top: 5px;
   padding-bottom: 5px;
   display: flex;
@@ -150,17 +149,99 @@ justify-content: space-between;
 }
 
 .SortNav{
-  Width: 300px;
+  Width: 340px;
   display: flex;
   justify-content: space-between;
-  padding: 30px 0px;
+  padding: 30px 10px;
+}
+
+.sortReset{
+width: 86px;
 }
 
 .SeasonDescriptionImage{
-  width:300px;
-  height: 500px;
+  width:265px;
+  height: 420px;
   margin-top: 20px;
   margin-left: 30px;
+}
+
+.history{
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: center;
+}
+
+.HistorySection{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.favourites{
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: center;
+  
+}
+
+.favouriteSection{
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  align-items:center;
+}
+
+.favTitle{
+  margin: 30px 0px;
+
+}
+
+.favButtons{
+  display: flex;
+  margin-top: 10px;
+  gap:6px;
+}
+
+.resetButton{
+  width: 80px;
+  margin-bottom: 30px;
+}
+
+.HistoryAndFavButtons{
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.HistoryTitle{
+  margin: 30px 0px;
+  display: flex;
+  justify-content: center;
+}
+
+.HistorySection{
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  align-items: center;
+}
+
+.episodeSection{
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  align-items: center;
+}
+
+.EpisodeButtons{
+  display: flex;
+  margin-top: 10px;
+  gap:6px;
+}
+
+.seasonTitleOfEpisodes{
+  margin: 30px 0px;
 }
 
 .SeasonDescription{
@@ -173,8 +254,12 @@ justify-content: space-between;
 
 .scroll-Container{
   display: flex;
+  gap: 10px;
 }
 
+.seasonDivs{
+ margin-left: 10px;
+}
 
 @media screen and (min-width: 780px) {
   .SeasonDescription{
@@ -189,6 +274,10 @@ justify-content: space-between;
   }
   .SortNav{
     Width: 360px;
+  }
+  .seasonDivs{
+    width:900px;
+    margin-left: 60px;
   }
 }
  
