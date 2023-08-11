@@ -27,7 +27,7 @@ export default function Carousel(props) {
         }
     };
 
-    const previewElements = props.Preview.map(item => {
+    const previewElements = props.Preview.slice(17, 30).map(item => {
         const UpdatedDate = new Date(item.updated)
         return (
             <button
