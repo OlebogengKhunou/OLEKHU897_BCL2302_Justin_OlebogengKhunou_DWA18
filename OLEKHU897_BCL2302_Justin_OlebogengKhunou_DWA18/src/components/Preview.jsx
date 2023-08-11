@@ -50,7 +50,7 @@ export default function Preview(props) {
     })
 
     return (
-        <div>
+        <div className="previewDiv">
             {
                 previewElements
             }
