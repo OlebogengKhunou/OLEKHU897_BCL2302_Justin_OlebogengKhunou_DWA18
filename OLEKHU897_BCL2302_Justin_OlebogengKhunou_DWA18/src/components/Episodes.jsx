@@ -55,7 +55,7 @@ export default function Episodes(props) {
                 if (error) {
                     console.error('Error inserting data:', error.message);
                 } else {
-                    console.log('Data inserted successfully:', data);
+                    // console.log('Data inserted successfully:', data);
                 }
             } catch (error) {
                 console.error('Error inserting data:', error.message);
@@ -70,21 +70,24 @@ export default function Episodes(props) {
             >
                 <h3>{item.title}</h3>
                 <p>Episode: {item.episode}</p>
+                <div className="EpisodeButtons">
                 {isButtonClicked === 'Clicked' ? <img src="https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678087-heart-512.png" className="LikeImage"/> : HandleAddingToFavourites(item.title) &&
                  <img src="https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678087-heart-512.png" className="LikeImage"/>}
-                <button id={item.file} title={item.title} onClick={props.HandleAudioPlay}>Play</button>
+                <button id={item.file} title={item.title} data-description={item.description} data-episodenumber={item.episode} onClick={props.HandleAudioPlay}>Play</button>
                 {isButtonClicked === 'Clicked' ? <button disabled={true}>Add To Favorites</button> :  <button disabled={HandleAddingToFavourites(item.title)} onClick={() => HandleFavouriteStoring(item.title, item.description, item.episode, item.file)}
                 >Add To Favorites</button>}
+                </div>
             </div>
         )
     })
 
     return (
-        <>
+        <div className="episodeSection">
+            <h1 className="seasonTitleOfEpisodes">{props.favouriteSeasonTitle}</h1>
             {
                 episodeElements
             }
-        </>
+        </div>
 
     )
 }
