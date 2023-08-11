@@ -11,17 +11,17 @@ export const supabase = createClient(
 export default function Sign() {
  
   return (
-
+  <div className='signUpdiv'>
     <div className='signUp'>
-      <h1>PopCast</h1>
+      <h1>PodCast & Chill</h1>
       <Auth
         supabaseClient={supabase}
         appearance={{ theme: ThemeSupa }}
         theme="dark"
-      />
-      
+        providers={['google', 'github']}
+      />  
     </div>
-
+    </div>
 
   );
 }
