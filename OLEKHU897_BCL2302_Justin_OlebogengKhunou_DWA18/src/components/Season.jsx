@@ -18,15 +18,17 @@ export default function Season(props) {
     })
 
     return (
-        <>
-            { <>
-              <div className="SeasonInfo">
-              <img src={props.showImg} className="SeasonDescriptionImage"/>
-              <div className='SeasonDescription'>{props.ShowDes}</div>
-              </div>
-                {seasonElements}
-               </>
+        <div className="seasonSection">
+            {<>
+                <div className="SeasonInfo">
+                    <img src={props.showImg} className="SeasonDescriptionImage" />
+                    <div className='SeasonDescription'>{props.ShowDes}</div>
+                </div>
+                <div className="seasonDivs">
+                    {seasonElements}
+                </div>
+            </>
             }
-        </>
+        </div>
     )
 }
