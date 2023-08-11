@@ -1,4 +1,5 @@
 import React from 'react'
+import Fuse from 'fuse.js'
 import SignIn from './components/SignIn';
 import Preview from './components/Preview';
 import Season from './components/Season'
@@ -17,25 +18,18 @@ function App() {
   const [phase, setPhase] = React.useState('signUpPhase')
   const [phaseState, setPhaseState] = React.useState({
     Preview: [],
-    searchPreview: [],
+    DefaultPreview: [],
     Season: '',
     Episode: ''
   });
+
   const [favourite, setFavourite] = React.useState({
     favouriteShowTitle: '',
     favouriteSeasonTitle: '',
   });
 
-   const genres = ['Personal Growth','True Crime and Investigative Journalism','History',
- 'Comedy', 'Entertainment', 'Business', 'Fiction', 'News', 'Kids and Family'
-]
 
-
-  function HandleSearch(event) {
-    setSearch(event.target.value);
-  }
-
-
+//If the signIn is correct then the Phase will change to loading page for preview
   React.useEffect(() => {
     const authListener = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session) {
@@ -44,13 +38,24 @@ function App() {
         setPhase('startPhase')
       }
     });
-
-   
     return () => {
       authListener.unsubscribe;
     };
   }, []);
 
+  
+//Used Fuse for Searching specific via user input. 
+  const fuse = new Fuse(phaseState.DefaultPreview, {
+    keys: ['title'],includeScore: true
+  })
+  
+  function HandleSearch(event) {
+    setSearch(event.target.value);
+  }
+  const results = fuse.search(search)
+  const FilteredElements = search ? results.map(result => result.item) : phaseState.Preview
+  
+//Fetching Preview data and set PreviewPhase to fetched data then set Phase to Preview.
   React.useEffect(() => {
     fetch("https://podcast-api.netlify.app/shows")
       .then(res => res.json())
@@ -63,13 +68,13 @@ function App() {
           setPhase('previewPhase')
           setPhaseState(prevState => ({
             ...prevState,
-            searchPreview: data
+            DefaultPreview: data
           }))
         }
       })
   }, [phase])
 
-
+//fetching Seasons data
   async function HandlePreviewClick(event) {
     if (phase === 'previewPhase') {
       const buttonId = event.currentTarget.id
@@ -98,6 +103,7 @@ function App() {
     }
   }
 
+// Getting Episodes Object from the Season Object clicked
   function HandleSeasonClick(event) {
     if (phase === 'seasonPhase') {
       const seasonButtonId = event.currentTarget.id
@@ -124,42 +130,69 @@ function App() {
   //Audio play
   const [audioPlaying, setaudioPlaying] = React.useState(
     {
-      title: "",
-      audio: null
+      title: '',
+      audio: ''
     }
   );
 
-  function HandleAudioPlay(event) {
+  //Collects episode details via attributes
+  async function HandleAudioPlay(event)  {
     const audioToPlay = event.target.id
     const audioTitle = event.target.title
+    const EpisodeDescription =  event.target.getAttribute('data-description')
+    const EpisodeNumber =  event.target.getAttribute('data-episodenumber')
     
     setaudioPlaying(prev => ({
       ...prev,
       audio: audioToPlay 
     }))
     setaudioPlaying(prev => ({
-      ...prev,title: audioTitle
+      ...prev,
+      title: audioTitle
   }))
-}
+
+    const Season = favourite.favouriteSeasonTitle
+    const Show = favourite.favouriteShowTitle
+    const Email = userLogIn
+    const EpisodeTitle = audioTitle
+    const EpisodeFile = audioToPlay
+
+    try {
+        const { data, error } = await supabase
+            .from('History')
+            .insert([
+                { Season, Show, EpisodeTitle, EpisodeDescription, EpisodeNumber, EpisodeFile, Email },
+            ]);
+
+        if (error) {
+            console.error('Error inserting data:', error.message);
+        } else {
+            // console.log('Data inserted successfully:', data);
+        }
+    } catch (error) {
+        console.error('Error inserting data:', error.message);
+    };
+}``
 
   function HandleMiniPlayClose() {
-    setaudioPlaying(prevA => ({
-      ...prevA,
-      audio: null, title: null
-    }))
-  }
+      const shouldClose = confirm("Are you sure you want to close miniplayer?");
+      if (shouldClose) {
+        setaudioPlaying(prevA => ({
+          ...prevA,
+          audio: '', title: ''
+        }))
+      }
+    }
 
-  
-  const FilteredElements = phaseState.Preview.filter((show) => show.title.toLowerCase().includes(search.toLowerCase()));
-
+// Sorting Section
   function SortByGender(event){
-    const selectedGenre = event.target.value
+    const selectedGenre = parseInt(event.target.value)
     setPhaseState(prevPhase => ({
       ...prevPhase,
-      Preview: phaseState.searchPreview.filter(show => { show.genres.some(genre => selectedGenre.includes(genre))
-      })
+      Preview: phaseState.DefaultPreview.filter((item)=> item.genres.includes(selectedGenre)) 
     }))
   }
+
   function sortByAscending() {
     setPhaseState(prevPhase => ({
       ...prevPhase,
@@ -185,6 +218,7 @@ function App() {
     }))
   }
 
+//Back Button
   function HandleBack() {
     if (phase === "seasonPhase") {
       setPhase('previewPhase')
@@ -196,6 +230,9 @@ function App() {
       setPhase('signUpPhase')
     }
     else if (phase === 'favouritePhase') {
+      setPhase('previewPhase')
+    }
+    else if (phase === 'historyPhase') {
       setPhase('previewPhase')
     }
   }
@@ -213,7 +250,10 @@ function App() {
            </div> 
         <div className='bottomNav'>
         {phase === "previewPhase" && <input onChange={HandleSearch} placeholder="Search..." value={search} type='text' />}
-        {phase !== "favouritePhase" && <button onClick={()=>setPhase('favouritePhase')}>Favourites</button>}  
+        <div className='HistoryAndFavButtons'>
+        {phase !== "favouritePhase" && <button onClick={()=>setPhase('favouritePhase')}>Favourites</button>}
+        {phase !== "historyPhase" && <button onClick={()=>setPhase('historyPhase')}>History</button>}  
+        </div>
         </div>
       </div>
        </nav>
@@ -223,7 +263,7 @@ function App() {
       <div className='Causarol'>
         <Carousel
          HandlePreviewClick={HandlePreviewClick}   
-         Preview={phaseState.searchPreview}
+         Preview={phaseState.DefaultPreview}
         />
         </div>
         <h1>Only The Best To Watch</h1>
@@ -232,9 +272,9 @@ function App() {
             <button onClick={sortByDescending}>Z-A</button>
             <button onClick={sortByLatest}>Latest</button>
             <button onClick={sortByOldest}>Oldest</button>
-            <button value={4}  onClick={SortByGender}>Comedy</button>
-            <button value={3} onClick={SortByGender}>History</button>
             <button value={7} onClick={SortByGender}>Fiction</button>
+            <button value={3} onClick={SortByGender}>History</button>
+            <button value={5}  onClick={SortByGender}>Entertainment</button>
           </div>
         </>
           }
@@ -245,12 +285,11 @@ function App() {
       
       { phase === 'signUpPhase' ? <SignIn /> :
         phase === 'startPhase' ? <div>{"LOADING..."}</div>  :
-        phase === "favouritePhase" ? <><h1>FAVOURITES</h1>
-                                     <Favorites
-                                     HandleAudioPlay={HandleAudioPlay}/></>:
-        phase === "favouritePhase" ? <><h1>Listen History</h1>
-                                     <History
-                                     Handle/></>:                          
+        phase === "favouritePhase" ? <Favorites
+                                     HandleAudioPlay={HandleAudioPlay}
+                                     email={userLogIn}/>:
+        phase === "historyPhase" ? <History
+                                     email={userLogIn}/>:                          
         phase ===  'previewPhase' ?  <Preview   
                                      HandlePreviewClick={HandlePreviewClick}   
                                      Preview={FilteredElements} /> :
@@ -268,10 +307,11 @@ function App() {
                                     /> : console.log('Episode Not fount')
       }
      </div>
-      {(audioPlaying.audio  && phase !== 'signUpPhase') &&
+     
+      {(audioPlaying.audio  && phase !== 'signUpPhase' && phase !== 'startPhase') &&
         <div id='miniplayer' className="episodes">
           <h3>{audioPlaying.title}</h3>
-          <audio src={audioPlaying.audio} controls autoPlay='false' />
+          <audio src={audioPlaying.audio} controls autoPlay/>
           <button onClick={HandleMiniPlayClose}>Close</button>
         </div>
       }
